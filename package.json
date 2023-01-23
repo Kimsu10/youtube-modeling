@@ -1,0 +1,31 @@
+{
+  "name": "wetube",
+  "version": "1.0.0",
+  "description": "youtube modeling",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon --exec babel-node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kimsu10/wetube-modeling.git"
+  },
+  "author": "kimsu10",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kimsu10/wetube-modeling/issues"
+  },
+  "homepage": "https://github.com/Kimsu10/wetube-modeling#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.20"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/node": "^7.20.7",
+    "@babel/preset-env": "^7.20.2"
+  }
+}
