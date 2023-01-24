@@ -1,8 +1,7 @@
-export const homePage = (req, res) => res.send("Homepage Videos");
+export const homePage = (req, res) => res.render("home"); //home.pug를 렌더링해서 가져온다.
 export const search = (req, res) => res.send("Search");
-export const see = (req, res) => {
-  return res.send(`Watch Video #${req.params.id}`);
-};
+export const see = (req, res) => res.render("watch");
+
 //res.send("See video");
 export const edit = (req, res) => res.send("Edit");
 export const upload = (req, res) => res.send("Upload Video");
