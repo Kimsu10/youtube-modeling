@@ -1,6 +1,6 @@
 import express from "express"; //각각의 파일들은 독립적이기에 새롭게 불러와야한다.
 import { join, login } from "../controllers/userController";
-import { homePage, search } from "../controllers/videoController";
+import { homePage, search, see } from "../controllers/videoController";
 
 const globalRouter = express.Router(); //글로벌 라우터를 만듬
 
