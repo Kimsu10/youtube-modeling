@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"; //몽구스 임포트하기
 
 mongoose.connect("mongodb://127.0.0.1:27017/wetube");
 //connect(uris:string, options:mongoose.ConnectOprions,callback:Promise)
@@ -10,5 +10,8 @@ const db = mongoose.connection;
 
 const handleOpen = () => console.log("✅Connected to DB");
 const handleError = () => console.log("❌DB Error", error);
+
 db.on("error", handleError);
 db.once("open", handleOpen);
+
+//db를 mongoose와연결시켜 video model을 인식시켜야한다.
