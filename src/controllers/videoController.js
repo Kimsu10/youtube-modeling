@@ -1,11 +1,12 @@
 import Video from "../models/video";
 
-export const home = (req, res) => {
-  console.log("start");
-  Video.find({}, (error, videos) => {
-    console.log("finished");
+export const home = async (req, res) => {
+  try {
+    const videos = await Video.find({});
     return res.render("home", { pageTitle: "Home", videos });
-  });
+  } catch (error) {
+    return res.render("server-error", { error });
+  }
 };
 
 export const search = (req, res) => res.send("Search");
@@ -13,12 +14,11 @@ export const search = (req, res) => res.send("Search");
 export const watch = (req, res) => {
   const { id } = req.params;
   return res.render("watch", { pageTitle: `Watching` }); //->watch라는 템플릿을 렌더링해줌
-};
+}; //return이 watchFunction의 id를 리턴해줌
 
 //res.send("See video");
 export const getEdit = (req, res) => {
   const { id } = req.params;
-
   return res.render("edit", { pageTitle: `Editing` });
 };
 
@@ -42,8 +42,21 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video" });
 };
 
-export const postUpload = (req, res) => {
-  //here we will add a videos array
-  const { title } = req.body;
-  return res.redirect("/");
+export const postUpload = async (req, res) => {
+  const { title, description, hashtags } = req.body;
+  try {
+    await Video.create({
+      title: title, //title(schema형식의): title(req.body의)
+      description: description,
+      hashtags: hashtags.split(",").map((word) => `#${word}`),
+    });
+    return res.redirect("/");
+  } catch (error) {
+    console.log(error);
+    return res.render("upload", {
+      pageTitle: "upload Video",
+      errorMessage: error._message,
+    });
+  }
+  //await Video.save();
 };
