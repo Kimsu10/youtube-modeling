@@ -1,53 +1,31 @@
-const videos = [
-  {
-    title: "First Video",
-    rating: 5,
-    comments: 42,
-    createdAt: "2minutes ago",
-    views: 90,
-    id: 1,
-  },
-  {
-    title: "Second Video",
-    rating: 3,
-    comments: 21,
-    createdAt: "2minutes ago",
-    views: 28,
-    id: 2,
-  },
-  {
-    title: "Third Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2minutes ago",
-    views: 59,
-    id: 3,
-  },
-];
+import Video from "../models/video";
 
-export const homePage = (req, res) => {
-  res.render("home", { pageTitle: "Home", videos }); //home.pug를 렌더링해서 가져온다.
-}; //home 템플릿에 비디오 배열을 보내야하니까 videos 추가
+export const home = (req, res) => {
+  console.log("start");
+  Video.find({}, (error, videos) => {
+    console.log("finished");
+    return res.render("home", { pageTitle: "Home", videos });
+  });
+};
 
 export const search = (req, res) => res.send("Search");
 
 export const watch = (req, res) => {
-  const { id } = req.params; //->
-  const video = videos[id - 1]; //아래 오른쪽 끝의 비디오는 여기서 오브젝트를 보내주는것이다.강의6-2
-  return res.render("watch", { pageTitle: `Watching: ${video.title}`, video }); //->watch라는 템플릿을 렌더링해줌
+  const { id } = req.params;
+  return res.render("watch", { pageTitle: `Watching` }); //->watch라는 템플릿을 렌더링해줌
 };
 
 //res.send("See video");
 export const getEdit = (req, res) => {
   const { id } = req.params;
-  const video = videos[id - 1];
-  return res.render("edit", { pageTitle: `Editing ${video.title}`, video });
+
+  return res.render("edit", { pageTitle: `Editing` });
 };
 
 export const postEdit = (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
-  videos[id - 1].title = title;
+
   return res.redirect(`/videos/${id}`); //redirect()는 브라우저가 자동으로 이동하도록 하는것이다.
 };
 
@@ -67,14 +45,5 @@ export const getUpload = (req, res) => {
 export const postUpload = (req, res) => {
   //here we will add a videos array
   const { title } = req.body;
-  const newVideo = {
-    title,
-    rating: 0,
-    comments: 0,
-    createAt: "just now",
-    views: 0,
-    id: videos.length + 1,
-  };
-  videos.push(newVideo);
   return res.redirect("/");
 };
