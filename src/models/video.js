@@ -1,16 +1,25 @@
 import mongoose from "mongoose";
 
 const videoSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  createdAt: Date,
-  hashtags: [{ type: String }],
+  title: { type: String, required: true, trim: true, maxLength: 80 },
+  //데이터베이스쪽에도 html제한을 쓰는이유는 누군가 해킹햇을때 보호하기 위해서이다.
+  description: { type: String, required: true, trim: true, minLength: 20 },
+  createdAt: { type: Date, required: true, default: Date.now },
+  //default를 설정함으로써 컨트롤러에서 createdAt을 안써도 된다.
+  hashtags: [{ type: String, trim: true }],
   meta: {
-    views: Number,
-    rating: Number,
+    views: { type: Number, default: 0, reauired: true },
+    rating: { type: Number, default: 0, required: true },
   },
 });
 //video의 어떤 형식으로 정의될지 형태 정의하기
+
+// videoSchema.pre("save", async function () {
+//   console.log(this.hashtags);
+//   this.hashtags = this.hashtags[0]
+//     .split(",")
+//     .map((word) => (word.startsWith("#") ? word : `#${word}`));
+// });
 
 const Video = mongoose.model("Video", videoSchema);
 //형태를 정의한후에 model을 만든후 schema(데이터의 형태)로 구성
