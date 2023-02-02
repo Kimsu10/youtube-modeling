@@ -14,6 +14,13 @@ const videoSchema = new mongoose.Schema({
 });
 //video의 어떤 형식으로 정의될지 형태 정의하기
 
+// videoSchema.pre("save", async function () {
+//   console.log(this.hashtags);
+//   this.hashtags = this.hashtags[0]
+//     .split(",")
+//     .map((word) => (word.startsWith("#") ? word : `#${word}`));
+// });
+
 const Video = mongoose.model("Video", videoSchema);
 //형태를 정의한후에 model을 만든후 schema(데이터의 형태)로 구성
 export default Video;

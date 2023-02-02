@@ -1,5 +1,6 @@
 import "./db";
 import "./models/video";
+import "./models/User";
 import app from "./server";
 //데이터베이스와 비디오를 임포트해주고
 
