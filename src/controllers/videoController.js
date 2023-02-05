@@ -1,4 +1,4 @@
-import Video from "../models/video";
+import Video from "../models/Video";
 
 export const home = async (req, res) => {
   try {
@@ -11,17 +11,30 @@ export const home = async (req, res) => {
 
 export const search = async (req, res) => {
   const { keyword } = req.query;
-  let videos = []; //블록밖에서 쓸꺼라 const쓰면 안된다.
+  let videos = [];
   if (keyword) {
-    const videos = await Video.find({
+    videos = await Video.find({
       title: {
-        //$regex: new RegExp(keyword, "i"),//i를 포함하는 키워드를 검색
-        //$regex: new RegExp(`^${keyword`}, "i")// i로 시작하는 단어만,키워드뒤에 $면 끝나는 단어
+        $regex: new RegExp(`${keyword}$`, "i"),
       },
     });
   }
   return res.render("search", { pageTitle: "Search", videos });
 };
+// export const search = async (req, res) => {
+//   const { keyword } = req.query;
+//   //let videos = []; //블록밖에서 쓸꺼라 const쓰면 안된다.
+//   if (keyword) {
+//     const videos = await Video.find({
+//       // title: {
+//       //   //$regex: new RegExp(keyword, "i"),//i를 포함하는 키워드를 검색
+//       //   //$regex: new RegExp(`^${keyword`}, "i")// i로 시작하는 단어만,키워드뒤에 $면 끝나는 단어
+//       // },
+//       title: keyword,
+//     });
+//     return res.render("search", { pageTitle: "Search", videos });
+//   }
+// };
 
 export const watch = async (req, res) => {
   const { id } = req.params;
