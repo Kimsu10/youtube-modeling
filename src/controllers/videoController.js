@@ -52,7 +52,7 @@ export const getEdit = async (req, res) => {
   const video = await Video.findById(id); //video를 먼저 찾고
   if (!video) {
     //비디오가 없으면 에러
-    return res.render("404", { pageTitle: "Video not found" });
+    return res.status(404).render("404", { pageTitle: "Video not found" });
   } else {
     return res.render("edit", { pageTitle: `Edit ${video.title}`, video });
   } //리턴이 없으면 에러가 나도 아래코드까지 실행하므로 리턴을꼭쓰자.
@@ -63,7 +63,7 @@ export const postEdit = async (req, res) => {
   const video = await Video.exists({ _id: id }); //exist는 필터가 필요하고 어떤 프로퍼티든 필터가 가능하다. 반면에 findById는 인자로 id가 필요하다. 구분해서 쓰자.
   const { title, description, hashtags } = req.body;
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found" });
+    return res.status(404).render("404", { pageTitle: "Video not found" });
   } //대문자 비디오는 모델의, 소문자 비디오는 객체의
   await Video.findByIdAndUpdate(id, {
     title,
@@ -79,8 +79,6 @@ export const postEdit = async (req, res) => {
 
 export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
-  console.log(hashtags);
-
   try {
     await Video.create({
       title: title, //title(schema형식의): title(req.body의)
@@ -91,7 +89,7 @@ export const postUpload = async (req, res) => {
     });
     return res.redirect("/");
   } catch (error) {
-    return res.render("upload", {
+    return res.status(400).render("upload", {
       pageTitle: "upload Video",
       errorMessage: error._message,
     });
