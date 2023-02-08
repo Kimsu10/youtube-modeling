@@ -57,6 +57,9 @@ export const postLogin = async (req, res) => {
       errorMessage: "Wrong password",
     });
   }
+  //세션에 정보 추가하기
+  req.session.loggedIn = true;
+  req.session.user = user;
   return res.redirect("/");
 };
 
