@@ -100,7 +100,6 @@ export const postUpload = async (req, res) => {
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
   await Video.findByIdAndDelete(id);
-  console.log(id);
   return res.redirect("/");
 };
 //export default와 각각의 변수를 export하는 것의 차이점

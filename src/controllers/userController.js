@@ -1,10 +1,10 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import fetch from "node-fetch";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
   const { name, email, username, password, password2, location } = req.body;
-  console.log(req.body);
   const pageTitle = "Join";
   const exists = await User.exists({ $or: [{ username }, { email }] });
   if (exists) {
@@ -61,6 +61,68 @@ export const postLogin = async (req, res) => {
   req.session.loggedIn = true;
   req.session.user = user;
   return res.redirect("/");
+};
+
+export const startGithubLogin = (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    allow_signup: false,
+    scope: "read:user user:email ",
+  }; //scope spacebar caution
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  return res.redirect(finalUrl);
+};
+
+export const finishGithubLogin = async (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/access_token";
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    client_secret: process.env.GH_SECRET,
+    code: req.query.code,
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  const tokenRequest = await (
+    await fetch(finalUrl, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+  ).json;
+  // const json = await data.json(); 위에 await 을 두번 선언하여 이것은 쓰지 않아도 된다.
+  if ("access_token" in tokenRequest) {
+    //access api
+    const { access_token } = tokenRequest;
+    const apiUrl = "https://api.github.com";
+    const userData = await (
+      await fetch(`${apiUrl}/user`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ) //fetch를 요청하고
+      .json(); //fetch가 돌아오면 해당 fetch의 json을 받는다.
+    console.log(userData);
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    console.log(emailData);
+    const email = emailData.find(
+      (email) => email.primary === true && email.verified === true
+    );
+    if (!email) {
+      return res.redirect("/login");
+    }
+  } else {
+    return res.redirect("/login");
+  }
 };
 
 export const deleteUser = (req, res) => res.send("Delete User");

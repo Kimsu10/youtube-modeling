@@ -1,9 +1,10 @@
+import "dotenv/config"; //env에 접근할 수 있도록 최상단에 놓아준다.
 import "./db";
 import "./models/Video";
 import "./models/User";
 import app from "./server";
-//데이터베이스와 비디오를 임포트해주고
 
+//데이터베이스와 비디오를 임포트해주고
 const PORT = 4000;
 
 const handleListening = () =>

@@ -1,12 +1,11 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
-import mongoStore from "connect-mongo";
+import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
 import { localsMiddleware } from "./middlewares";
-import MongoStore from "connect-mongo";
 
 const app = express();
 
@@ -19,18 +18,21 @@ app.use(express.urlencoded({ extended: true })); //expree application이 form의
 //app.get을 지우고 app.use를쓰는이유 나중에 url이 여러개가 되는데 url을 그룹별로 정리하지않으면 지저분해보이며, 찾기어려워져서 도메인에따라 그룹화했다.
 //url 플랜을 짤때는 유저의 입장에서 생각해야한다.
 
+//console.log(process.env.COOKIE_SECRET);
+
 app.use(
   session({
-    secret: "HiKSJ!",
-    resave: true,
-    saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: "mongodb://127.0.0.1:27017/wetube" }),
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
+    //cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true },
   })
 );
 //세션미들웨어보다 로컬미들웨어가 위에있으면 값이 나오지 않는다.
 app.use((req, res, next) => {
   req.sessionStore.all((error, sessions) => {
-    console.log(sessions);
+    //console.log(sessions);
     next();
   });
 });
