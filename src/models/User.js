@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  avartar: String,
   //githubId: { type: Number, required: false, unique: true },
   socialOnly: { type: Boolean, default: false },
   email: { type: String, required: true, unique: true },
