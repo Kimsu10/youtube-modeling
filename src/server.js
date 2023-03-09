@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 
 app.use(localsMiddleware);
 //세션미들웨어를 만들때 반드시 라우터보다 앞 쪽에 써주어야한다.secret은 나중에 아무도 모르는 문자열로쓴다.
-//세션미들웨어가 사이트로 들어오는 ㅗ든 유저를 기억하게된다.
+//세션미들웨어가 사이트로 들어오는 모든 유저를 기억하게된다.
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

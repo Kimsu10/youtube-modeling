@@ -6,13 +6,19 @@ import {
   postLogin,
 } from "../controllers/userController";
 import { home, search } from "../controllers/videoController";
+import { publicOnlyMiddleware } from "../middlewares";
 
 const rootRouter = express.Router(); //글로벌 라우터를 만듬
 
 //const handleHome = (req, res) => res.send("Home"); //굴로벌라우터를 설정
 
 rootRouter.get("/", home);
-rootRouter.route("/join").get(getJoin).post(postJoin);
-rootRouter.route("/login").get(getLogin).post(postLogin);
+rootRouter.route("/join").all(publicOnlyMiddleware).get(getJoin).post(postJoin);
+rootRouter
+  .route("/login")
+  .all(publicOnlyMiddleware)
+  .get(getLogin)
+  .post(postLogin);
 rootRouter.get("/search", search);
+
 export default rootRouter; //그로벌라우터를 외부에서 쓸수있도록 익스포트함

@@ -20,18 +20,19 @@ export const postJoin = async (req, res) => {
     });
   }
   try {
+    console.log(1);
     await User.create({
       name,
+      socialOnly: false,
       email,
       username,
       password,
-      password2,
       location,
     });
     return res.redirect("/login");
   } catch (error) {
     return res.status(400).render("join", {
-      pageTitle: "Upload Video",
+      pageTitle: "join",
       errorMessage: error._message,
     });
   }
@@ -50,7 +51,7 @@ export const postLogin = async (req, res) => {
       errorMessage: "an Account with this username deos not exists.",
     });
   }
-  const ok = await bcrypt.compare(password, user.password);
+  const ok = bcrypt.compare(password, user.password);
   if (!ok) {
     return res.status(400).render("login", {
       pageTitle,
@@ -153,8 +154,62 @@ export const getEdit = (req, res) => {
     // user: req.session.user,
   });
 };
-export const postEdit = (req, res) => {
-  return res.render("edit-profile");
+export const postEdit = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { name, email, username, location },
+  } = req;
+  //위는 ES6이고 const id = req.session.user.id 와 같다.
+  //const { name, email, username, location } = req.body;
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      email,
+      username,
+      location,
+    },
+    { new: true }
+  );
+  req.session.user = findByIdAndUpdate;
+  return res.redirect("/users/edit");
+}; //이렇게 한것만으로는 프로필을 바꿀수가없다.미들웨어에서 console을 찍어보자.
+//그럼 id가 없고 _id가 있는것을 확인 할 수 있다. id를 _id로 바꿔주자
+
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+
+export const postChangePassword = async (req, res) => {
+  // 8.5강 다시보기
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+  user.password = newPassword;
+  await user.save();
+  return res.redirect("/users/logout");
 };
 
 export const see = (req, res) => res.send("See");
