@@ -7,7 +7,7 @@ import {
   getUpload,
   postUpload,
 } from "../controllers/videoController";
-import { protectMiddleware } from "../middlewares";
+import { protectMiddleware, videoUpload } from "../middlewares";
 
 const videoRouter = express.Router();
 
@@ -25,7 +25,12 @@ videoRouter.get("/:id([0-9a-f]{24})/delete", protectMiddleware, deleteVideo);
 //내가 사이트 끝에 /:아무숫자를 넣으면 express가 그 숫자를  :id에 넣어준다. 이게 가능한 이유는 이렇게 표시/:하는것이 익스프레스에게 변수라는것을알려주기 때문이다.
 //:이 없으면 단순히 텍스트가 필요한거라 생각해서 작동하지 않게된다.
 videoRouter.get("/upload", protectMiddleware, getUpload);
-videoRouter.post("/upload", protectMiddleware, postUpload);
+videoRouter.post(
+  "/upload",
+  protectMiddleware,
+  videoUpload.single("video"),
+  postUpload
+);
 //videoRouter.route("upload").get(getUpload).post(postUpload);
 //videoRouter.post("/")
 

@@ -6,7 +6,7 @@ import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
 import { localsMiddleware } from "./middlewares";
-
+import axios from "axios";
 const app = express();
 
 const logger = morgan("dev");
@@ -43,5 +43,13 @@ app.use(localsMiddleware);
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
+app.use("/uploads", express.static("uploads"));
+app.use("/static", express.static("assets"));
 
+// axios
+//   .get(
+//     `http://api.ipstack.com/check?access_key=1ee71947eb6a71c4ab52fd8cf13532f8`
+//   )
+//   .then((response) => console.log(response.data))
+//   .catch((e) => console.log(e));
 export default app;

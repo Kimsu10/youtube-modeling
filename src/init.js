@@ -1,6 +1,6 @@
 import "dotenv/config"; //env에 접근할 수 있도록 최상단에 놓아준다.
 import "./db";
-import "./models/Video";
+import "./models/video";
 import "./models/User";
 import app from "./server";
 

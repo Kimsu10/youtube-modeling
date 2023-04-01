@@ -3,6 +3,7 @@ html(lang="ko")
     head
         title #{pageTitle} | Wetube
         link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        link(rel="stylesheet" href="/static/css/styles.css")
     body 
         header  
             h1=pageTitle
@@ -12,11 +13,13 @@ html(lang="ko")
                             a(href="/") Home
                         if loggedIn 
                             li 
+                                a(href="/videos/upload") Upload Video
+                            li 
+                                a(href=`/users/${loggedInUser._id}`) My Profile
+                            li 
                                 a(href="/users/edit") Edit Profile
                             li 
                                 a(href="/users/logout") Log Out 
-                            li 
-                                a(href="/my-profile") #{loggedInUser.name}의 프로필
                         else
                             li 
                                 a(href="/join") Join
@@ -24,8 +27,9 @@ html(lang="ko")
                                 a(href="/login") Login
                         li 
                             a(href="/search") Search
-                        li 
-                            a(href="/videos/upload") Upload Video
+                        
         main 
             block content
     include partials/footer
+
+    script(src="/static/js/main.js")

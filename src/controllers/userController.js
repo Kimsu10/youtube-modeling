@@ -1,4 +1,5 @@
 import User from "../models/User";
+import Video from "../models/video";
 import bcrypt from "bcrypt";
 import fetch from "node-fetch";
 
@@ -20,7 +21,6 @@ export const postJoin = async (req, res) => {
     });
   }
   try {
-    console.log(1);
     await User.create({
       name,
       socialOnly: false,
@@ -106,7 +106,7 @@ export const finishGithubLogin = async (req, res) => {
       })
     ) //fetch를 요청하고
       .json(); //fetch가 돌아오면 해당 fetch의 json을 받는다.
-    console.log(userData);
+    //console.log(userData);
     const emailData = await (
       await fetch(`${apiUrl}/user/emails`, {
         headers: {
@@ -114,7 +114,7 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(emailData);
+    //console.log(emailData);
     const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
@@ -157,15 +157,18 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avartarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = req;
+
   //위는 ES6이고 const id = req.session.user.id 와 같다.
   //const { name, email, username, location } = req.body;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
+      avartarUrl: file ? file.path : avartarUrl,
       name,
       email,
       username,
@@ -173,7 +176,7 @@ export const postEdit = async (req, res) => {
     },
     { new: true }
   );
-  req.session.user = findByIdAndUpdate;
+  req.session.user = updatedUser;
   return res.redirect("/users/edit");
 }; //이렇게 한것만으로는 프로필을 바꿀수가없다.미들웨어에서 console을 찍어보자.
 //그럼 id가 없고 _id가 있는것을 확인 할 수 있다. id를 _id로 바꿔주자
@@ -212,5 +215,17 @@ export const postChangePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
-export const see = (req, res) => res.send("See");
+export const see = async (req, res) => {
+  //모든사람이 볼 수 있게하기 위해서 id를 req.session에서 가져오지 않고 req.param에서가져오게함
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found." });
+  }
+
+  return res.render("users/profile", {
+    pageTitle: user.name,
+    user,
+  });
+};
 //export default join;

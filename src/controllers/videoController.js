@@ -1,4 +1,5 @@
-import Video from "../models/Video";
+import Video from "../models/video";
+import User from "../models/User";
 
 export const home = async (req, res) => {
   try {
@@ -38,33 +39,46 @@ export const search = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
-  if (video) {
-    return res.render("watch", { pageTitle: video.title, video: video }); //->watch라는 템플릿을 렌더링해줌
-  } else {
+  const video = await Video.findById(id).populate("owner");
+  console.log(video); //populate는 빈곳을 채워준다.(?)
+  //const owner = await User.findById(video.owner); <-bad code
+  if (!video) {
     return res.render("404", { pageTitle: "Video not found" });
   }
-}; //return이 watchFunction의 id를 리턴해줌
+  return res.render("watch", { pageTitle: video.title, video }); //->watch라는 템플릿을 렌더링해줌
+};
+//return이 watchFunction의 id를 리턴해줌
 
 //res.send("See video");
+
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id); //video를 먼저 찾고
   if (!video) {
     //비디오가 없으면 에러
     return res.status(404).render("404", { pageTitle: "Video not found" });
-  } else {
-    return res.render("edit", { pageTitle: `Edit ${video.title}`, video });
-  } //리턴이 없으면 에러가 나도 아래코드까지 실행하므로 리턴을꼭쓰자.
-};
+  }
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+  return res.render("edit", { pageTitle: `Edit ${video.title}`, video });
+}; //리턴이 없으면 에러가 나도 아래코드까지 실행하므로 리턴을꼭쓰자.
 
 export const postEdit = async (req, res) => {
-  const { id } = req.params;
+  const {
+    user: { id },
+  } = req.session;
   const video = await Video.exists({ _id: id }); //exist는 필터가 필요하고 어떤 프로퍼티든 필터가 가능하다. 반면에 findById는 인자로 id가 필요하다. 구분해서 쓰자.
   const { title, description, hashtags } = req.body;
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   } //대문자 비디오는 모델의, 소문자 비디오는 객체의
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndUpdate(id, {
     title,
     description,
@@ -78,17 +92,27 @@ export const postEdit = async (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
+  const { path: fileUrl } = req.file;
   const { title, description, hashtags } = req.body;
   try {
-    await Video.create({
-      title: title, //title(schema형식의): title(req.body의)
-      description: description,
+    const newVideo = await Video.create({
+      title,
+      description,
+      fileUrl,
+      owner: _id,
       hashtags: hashtags
         .split(",")
         .map((word) => (word.startsWith("#") ? word : `#${word}`)),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
+    console.log(error);
     return res.status(400).render("upload", {
       pageTitle: "upload Video",
       errorMessage: error._message,
@@ -99,6 +123,17 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found" });
+  }
+  if (String(video.owner) !== String(_id)) {
+    //겍체video.owner과 string _id 를 비교해서 다르게떠서
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndDelete(id);
   return res.redirect("/");
 };

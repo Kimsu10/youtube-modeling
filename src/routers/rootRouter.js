@@ -8,6 +8,8 @@ import {
 import { home, search } from "../controllers/videoController";
 import { publicOnlyMiddleware } from "../middlewares";
 
+import { getCurrentLocation } from "../location";
+
 const rootRouter = express.Router(); //글로벌 라우터를 만듬
 
 //const handleHome = (req, res) => res.send("Home"); //굴로벌라우터를 설정
@@ -20,5 +22,6 @@ rootRouter
   .get(getLogin)
   .post(postLogin);
 rootRouter.get("/search", search);
+rootRouter.get("/", getCurrentLocation);
 
 export default rootRouter; //그로벌라우터를 외부에서 쓸수있도록 익스포트함

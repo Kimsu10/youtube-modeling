@@ -1,8 +1,10 @@
+import multer from "multer";
+
 export const localsMiddleware = (req, res, next) => {
   res.locals.siteName = "Wetube";
   res.locals.loggedIn = Boolean(req.session.loggedIn);
   res.locals.loggedInUser = req.session.user || {};
-  console.log(req.session.user);
+  //console.log(req.session.user);
   next();
 };
 
@@ -26,5 +28,15 @@ export const publicOnlyMiddleware = (req, res, next) => {
   }
 };
 
-//export const uploadFiles = multer({ dest: "uploads/" });
+export const avartarupload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 3000000 },
+});
 //여기에는 req,res를 쓰지않고 multer()를 사용한다.
+
+export const videoUpload = multer({
+  dest: "uploads/videos/",
+  limits: {
+    fileSize: 100000000,
+  },
+});
