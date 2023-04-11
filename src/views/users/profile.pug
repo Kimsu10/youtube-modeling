@@ -2,8 +2,12 @@ extends ../base
 include  ../mixins/video
 
 block content 
-        each video in user.videos    
-                
+        div.profile__data
+                img(src="/" + user.avartarUrl).avatar
+                if loggedInUser.socialOnly img(src=user.avatarUrl).avatar else img(src="/" + user.avatarUrl).avatar
+                h3=user.name
+        div.video-grid
+                each video in user.videos
                 +video(video)
-        else 
-                li sorry nothung found.
+                else
+                span.empty__message No videos found

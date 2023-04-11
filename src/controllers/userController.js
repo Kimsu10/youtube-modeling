@@ -218,7 +218,13 @@ export const postChangePassword = async (req, res) => {
 export const see = async (req, res) => {
   //모든사람이 볼 수 있게하기 위해서 id를 req.session에서 가져오지 않고 req.param에서가져오게함
   const { id } = req.params;
-  const user = await User.findById(id).populate("videos");
+  const user = await User.findById(id).populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
   if (!user) {
     return res.status(404).render("404", { pageTitle: "User not found." });
   }
