@@ -9,7 +9,7 @@ const videoSchema = new mongoose.Schema({
   //default를 설정함으로써 컨트롤러에서 createdAt을 안써도 된다.
   hashtags: [{ type: String, trim: true }],
   meta: {
-    views: { type: Number, default: 0, reauired: true },
+    views: { type: Number, default: 0, required: true },
     rating: { type: Number, default: 0, required: true },
   },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
